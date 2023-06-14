@@ -1,0 +1,8 @@
+"""
+You can use the pip freeze > requirements.txt command.
+You can check the version of an installed package with the command pip show packagename.
+You can use the pip install -r requirements.txt to install all the dependencies for your project, including the correct versions.
+
+"""
+
+pyQt5==5.15.4
