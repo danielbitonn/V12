@@ -1,13 +1,9 @@
 
 import sys
-from src.util.win_creator import *
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from src.util.pyqt_geo_manager import *
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
-    createWin()
+    excecute_app()
+
 

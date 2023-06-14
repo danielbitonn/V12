@@ -12,8 +12,6 @@ class PackWindow(tk.Tk):
         tk.Label(self, text="Label 3").pack()
 
 
-import tkinter as tk
-
 class GridWindow(tk.Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
