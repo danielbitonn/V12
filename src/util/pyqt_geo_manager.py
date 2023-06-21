@@ -1,11 +1,18 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout, QVBoxLayout, QWidget, QPushButton
 from src.util.buttons_action import *
+from PyQt5.QtGui import QIcon
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         # Set window title
         self.setWindowTitle("Grid My PyQt Application")
+        self.resize(800, 600)
+        # self.setFixedSize(800, 600) #  fix the size of the window and prevent the user from resizing
+        
+        # Set window icon
+        self.setWindowIcon(QIcon('src/ref/media/v12.ico'))
+
         # Create a QWidget that will hold our layout
         self.widget = QWidget()
 
@@ -27,7 +34,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.widget)
 
     def button_clicked(self, button_num):
-        # print(f"Button {button_num} was clicked!")
+        """button_num is a natural number (N)"""
         button_action(button_num)
 
 
