@@ -26,9 +26,11 @@ class MainWindow(QMainWindow):
         self.add_widget(QLabel, "Hello, PyQt!", 0, 0)
 
         # Add the buttons to the layout using the add_widget method
+        # TODO: Mak
         self.add_widget(QPushButton, "Button 1", 1, 0, lambda: self.button_clicked(1))
         self.add_widget(QPushButton, "Button 2", 2, 0, lambda: self.button_clicked(2))
         self.add_widget(QPushButton, "Button 3", 3, 0, lambda: self.button_clicked(3))
+        self.add_widget(QPushButton, "Button 4", 4, 0, lambda: self.button_clicked(4))
 
         # Set the central widget of the window.
         self.setCentralWidget(self.widget)
