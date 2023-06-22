@@ -1,0 +1,6 @@
+
+azure:
+  connect_str: 'DefaultEndpointsProtocol=https;AccountName=v12daily;AccountKey=2tBxBHZwM5WNyzPAyozRtsircGCFBAMN2S3TfZGFN923bIlkWAjdn5scM5vV5TkYPFKvukfD/cL5+AStMluGag==;EndpointSuffix=core.windows.net'
+  container_name: 'gcsteamcont'
+  blob_name: 'test_to_gcsteamcont'
+
