@@ -2,3 +2,4 @@
 *.log
 tmp/
 config/conf.yaml
+src/util/conf.json

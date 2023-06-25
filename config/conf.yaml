@@ -4,3 +4,12 @@ azure:
   container_name: 'gcsteamcont'
   blob_name: 'test_to_gcsteamcont'
 
+
+indexes:
+  states: 'press-state-history*'
+  restarts: 'restarts*'
+  swv: 'sw-versions*'
+  substrates: 'substrate-properties-*'
+  prints: 'print-attempt*, print-session*'
+  events: 'event-history*'
+
