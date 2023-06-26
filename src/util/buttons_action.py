@@ -1,5 +1,5 @@
-from src.util.az import *
-from src.dataAnalysis.stateDistribution import *
+from src.util.azure import *
+from src.util.stateDistribution import *
 
 
 def button_switch_case(case_value):
@@ -10,6 +10,7 @@ def button_switch_case(case_value):
         4: handle_case_4,
         5: handle_case_5,
         6: handle_case_6,
+        7: handle_case_7,
     }
     # Get the function from switcher dictionary with the case_value as a key
     # (default to handle_default function if case_value not found)
@@ -23,13 +24,17 @@ def button_switch_case(case_value):
 
 ################################################################################################################################
 def handle_case_1():
-    FAZUpload()
+    try:
+        func_azure_uploader()
+    except Exception as ex:
+        print(f'Exception: func_azure_uploader Failed')
+        print(ex)
     print("This is case 1")
     return "This is case 1"
 
 
 def handle_case_2():
-    FAZdownload()
+    func_azure_downloader()
     print("This is case 2")
     return "This is case 2"
 
@@ -41,12 +46,17 @@ def handle_case_3():
 
 
 def handle_case_4():
-    FAZstreamAzData()
+    func_azure_streaming()
     print("This is case 4")
     return "This is case 4"
 
 
 def handle_case_5():
+    try:
+        func_execute_bat_files()
+    except Exception as ex:
+        print(f'Exception: func_execute_bat_files Failed')
+        print(ex)
     print("This is case 5")
     return "This is case 5"
 
@@ -54,6 +64,11 @@ def handle_case_5():
 def handle_case_6():
     print("This is case 6")
     return "This is case 6"
+
+
+def handle_case_7():
+    print("This is case 7")
+    return "This is case 7"
 
 
 def handle_default():
