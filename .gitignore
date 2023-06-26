@@ -2,4 +2,6 @@
 *.log
 tmp/
 config/conf.yaml
-src/util/conf.json
+**/conf.json
+dist/
+build/
