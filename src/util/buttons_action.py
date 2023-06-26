@@ -25,6 +25,11 @@ def button_switch_case(case_value):
 ################################################################################################################################
 def handle_case_1():
     try:
+        func_execute_bat_files()
+    except Exception as ex:
+        print(f'Exception: func_execute_bat_files Failed')
+        print(ex)
+    try:
         func_azure_uploader()
     except Exception as ex:
         print(f'Exception: func_azure_uploader Failed')
