@@ -4,7 +4,7 @@ import sys
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 import pandas as pd
 from io import BytesIO
-
+import os
 from config_manager import *
 
 # Load the configuration variables
@@ -14,6 +14,8 @@ indexes_config = config_variables['indexes']
 path_config = config_variables['paths']
 batsFiles_config = config_variables['batsFiles']
 
+
+# TODO: create 24h/48h/week extractor
 
 def generate_unique_name(base_name, existing_names):
     base_name_without_ext = os.path.splitext(base_name)[0]
@@ -68,8 +70,6 @@ def func_press_export_data():
 
 
 def func_azure_uploader():
-    func_press_export_data()
-
     try:
         connect_str = azure_config['connect_str']
         blob_service_client = BlobServiceClient.from_connection_string(connect_str)
@@ -119,7 +119,7 @@ def func_azure_downloader():
 
 
 def func_azure_streaming():
-    # TODO: handle
+    # TODO: handle-next phase
     try:
         connect_str = azure_config['connect_str']
         blob_service_client = BlobServiceClient.from_connection_string(connect_str)
@@ -134,12 +134,28 @@ def func_azure_streaming():
         print(ex)
 
 
+def func_azure_uploader_2(blob_name):
+    try:
+        connect_str = azure_config['connect_str']
+        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+        container_name = azure_config['container_name']
+
+        # Upload the created file
+        blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
+        with open(f"S:\\_db_\\V12App\\data\\{blob_name}", "rb") as data:
+            blob_client.upload_blob(data)
+    except Exception as ex:
+        print('Exception: func_azure_uploader_2 !!!!! Failed')
+        print(ex)
+
+
 def func_execute_bat_files():
     """ .bat files executes """
-    # TODO: Trying second method
     for batFile in batsFiles_config:
         try:
-            subprocess.run([f'{batsFiles_config[batFile]}'], shell=True)
+            subprocess.run(["cmd.exe", "/c", batsFiles_config[batFile]], shell=True)
+            # TODO: handle this function to upload by name
+            # func_azure_uploader_2()
         except Exception as ex:
             print(f'Exception: func_execute_bat_files Failed with {batsFiles_config[batFile]}')
             print(ex)

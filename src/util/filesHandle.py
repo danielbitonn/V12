@@ -46,3 +46,4 @@ def get_abs_path(relative_path):
     abs_path = os.path.join(root_dir, relative_path)
 
     return abs_path
+

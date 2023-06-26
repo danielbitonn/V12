@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout, QVBoxLayout, QWidget, QPushButton, QMdiArea, QMdiSubWindow
+from PyQt5.QtWidgets import QWidget, QFileDialog, QApplication, QMainWindow, QLabel, QGridLayout, QVBoxLayout, QWidget, \
+    QPushButton, QMdiArea, QMdiSubWindow
 from PyQt5.QtGui import QIcon
 from src.util.buttons_action import *
 
@@ -8,7 +9,8 @@ class MainWindow(QMainWindow):
         super().__init__()
         # Set window title
         self.setWindowTitle("Daily Report V12")
-        self.resize(1200, 600)  # self.setFixedSize(800, 600) #  fix the size of the window and prevent the user resizing
+        self.resize(1200,
+                    600)  # self.setFixedSize(800, 600) #  fix the size of the window and prevent the user resizing
 
         # Set window icon
         self.setWindowIcon(QIcon('src/ref/media/v12.ico'))
@@ -27,13 +29,13 @@ class MainWindow(QMainWindow):
         self.add_widget(QLabel, "Report Functionality", 0, 0)
 
         # TODO: Create an automation
-        self.add_widget(QPushButton, "Data Collector (Press-Only) & Push"   , 1, 0, lambda: self.button_clicked(1))
-        self.add_widget(QPushButton, "Import Data from cloud"               , 2, 0, lambda: self.button_clicked(2))
-        self.add_widget(QPushButton, "States Analysis"              , 3, 0, lambda: self.button_clicked(3))
-        self.add_widget(QPushButton, "Button 4"                     , 4, 0, lambda: self.button_clicked(4))
-        self.add_widget(QPushButton, "Button 5"                     , 5, 0, lambda: self.button_clicked(5))
-        self.add_widget(QPushButton, "Button 6"                     , 6, 0, lambda: self.button_clicked(6))
-        self.add_widget(QPushButton, "Button 7"                     , 7, 0, lambda: self.button_clicked(7))
+        self.add_widget(QPushButton, "Data Collector (Press-Only) & Push", 1, 0, lambda: self.button_clicked(1))
+        self.add_widget(QPushButton, "Import Data from cloud", 2, 0, lambda: self.button_clicked(2))
+        self.add_widget(QPushButton, "States Analysis", 3, 0, lambda: self.button_clicked(3))
+        self.add_widget(QPushButton, "Button 4", 4, 0, lambda: self.button_clicked(4))
+        self.add_widget(QPushButton, "Button 5", 5, 0, lambda: self.button_clicked(5))
+        self.add_widget(QPushButton, "Button 6", 6, 0, lambda: self.button_clicked(6))
+        self.add_widget(QPushButton, "Button 7", 7, 0, lambda: self.button_clicked(7))
 
         subwindow = QMdiSubWindow()
         subwindow.setWidget(self.widget)
