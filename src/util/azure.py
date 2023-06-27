@@ -50,8 +50,7 @@ def func_load_data_from_blob(blob_service_client, container_name, blob_name):
 
 def func_press_direct_cmd_exporter():
     output_path = path_config['PushExpDataPathRelCMD']
-    # exporter_path = path_config['PressEsExporter']
-    exporter_path = path_config['testEnv']
+    exporter_path = path_config['PressEsExporter']
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -80,7 +79,6 @@ def func_press_direct_cmd_exporter():
 
     for src in indexes_config:
         try:
-            # cmd = f'S:\\Press\\PressTools.EsExporter.exe -i {indexes_config[src]} -f {mydate}T{nameable_from} -t {mydate}T{nameable_time2} -o C:\\ExportedEsData'
             # cmd = f"{path_config['PressEsExporter']} -i {indexes_config[src]} -f {mydate}T{nameable_from} -t {mydate}T{nameable_time2} -o {path_config['exDataPath']}"
             # cmd = f"{exporter_path} -i {indexes_config[src]} -f {mydate}T{nameable_from} -t {mydate}T{nameable_time2} -o {output_path}"
             cmd = f"{cmdCommands_config['cmdExporterPath']} -i {indexes_config[src]} -f {cmdCommands_config['cmdMyDate']}T{cmdCommands_config['cmdFromTime']} -t {cmdCommands_config['cmdMyDate']}T{cmdCommands_config['cmdToTime']} -o {output_path}"
@@ -104,6 +102,7 @@ def func_azure_uploader(upload_source_path):
         blob_service_client = BlobServiceClient.from_connection_string(connect_str)
         container_name = azure_config['container_name']
 
+        print("\nconnect_phase_success\n")
         # Check list of the files in the container
         # container_client = blob_service_client.get_container_client(container_name)
         # existing_blobs = [blob.name for blob in container_client.list_blobs()]
@@ -126,8 +125,9 @@ def func_azure_uploader(upload_source_path):
             #     blob_client.upload_blob(data)
 
             blob_client = blob_service_client.get_blob_client(container=container_name, blob=fileName)
-            with open(f"{upload_source_path}\\{fileName}", "rb") as data:
+            with open(f"{upload_source_path}{fileName}", "rb") as data:
                 blob_client.upload_blob(data)
+            print(f"\n{fileName} Uploaded!\n")
 
     except Exception as ex:
         print('\nException: func_azure_uploader Failed in the Streaming-Downloading step')
@@ -144,6 +144,7 @@ def func_azure_downloader():
         connect_str = azure_config['connect_str']
         blob_service_client = BlobServiceClient.from_connection_string(connect_str)
         container_name = azure_config['container_name']
+        print("\nconnect_phase_success\n")
 
     except Exception as ex:
         print('\nException: func_azure_downloader - Connection Client Failed')
@@ -157,12 +158,14 @@ def func_azure_downloader():
         for blob in blob_list:
             download_path = os.path.join(downloaded_file_path, blob.name)
 
-            print(f"Downloading blob.name to {downloaded_file_path}")
+            print(f"Downloading {blob.name} to {downloaded_file_path}")
             blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob.name)
             with open(download_path, "wb") as download_file:
                 data = blob_client.download_blob().readall()
                 download_file.write(data)
-                # TODO: rename! based on blob.name and clean by the "__"
+            print(f"{blob.name} Downloaded\n")
+
+            # TODO: rename! based on blob.name and clean by the "__"
     except Exception as ex:
         print('Exception: func_azure_downloader Failed in download phase')
         print(ex)

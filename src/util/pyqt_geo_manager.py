@@ -33,7 +33,7 @@ class MainWindow(QMainWindow):
         self.add_widget(QPushButton, "\nAzure files downloader\n", 2, 0, lambda: self.button_clicked(2))
         self.add_widget(QPushButton, "\nStreaming Azure to DFs\n", 3, 0, lambda: self.button_clicked(3))
         self.add_widget(QPushButton, "\nDirect CMD commands exporter\n", 4, 0, lambda: self.button_clicked(4))
-        self.add_widget(QPushButton, "\nNone\n", 5, 0, lambda: self.button_clicked(5))
+        self.add_widget(QPushButton, "\nfunc_azure_uploader\n", 5, 0, lambda: self.button_clicked(5))
         self.add_widget(QPushButton, "\nNone\n", 6, 0, lambda: self.button_clicked(6))
         self.add_widget(QPushButton, "\nNone\n", 7, 0, lambda: self.button_clicked(7))
 

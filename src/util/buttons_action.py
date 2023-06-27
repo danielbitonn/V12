@@ -39,6 +39,7 @@ def handle_case_1():
     except Exception as ex:
         print(f'Exception: func_azure_uploader Failed')
         print(ex)
+        return
 
     print("\n\nCase 1 Done")
     return "This is case 1"
@@ -84,12 +85,20 @@ def handle_case_4():
 
 
 def handle_case_5():
-    # state_distribution_analysis()
+    try:
+        func_azure_uploader(upload_source_path=path_config['PushExpDataPathRel'])
+        print(f'\nfunc_azure_uploader Succeed!!!')
+    except Exception as ex:
+        print(f'Exception: func_azure_uploader Failed')
+        print(ex)
+        return
+
     print("This is case 5")
     return "This is case 5"
 
 
 def handle_case_6():
+    # state_distribution_analysis()
     print("This is case 6")
     return "This is case 6"
 
