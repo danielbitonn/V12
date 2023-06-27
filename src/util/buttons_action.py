@@ -24,17 +24,23 @@ def button_switch_case(case_value):
 
 ################################################################################################################################
 def handle_case_1():
+    """
+    Execute direct .bat files which are exporting data using esExporter.exe, then pull files to azure
+    """
     try:
         func_execute_bat_files()
+        print(f'\nfunc_execute_bat_files Succeed!!!')
     except Exception as ex:
         print(f'Exception: func_execute_bat_files Failed')
         print(ex)
     try:
-        func_azure_uploader()
+        func_azure_uploader(upload_source_path=path_config['PushExpDataPathRel'])
+        print(f'\nfunc_azure_uploader Succeed!!!')
     except Exception as ex:
         print(f'Exception: func_azure_uploader Failed')
         print(ex)
-    print("This is case 1")
+
+    print("\n\nCase 1 Done")
     return "This is case 1"
 
 
@@ -45,23 +51,40 @@ def handle_case_2():
 
 
 def handle_case_3():
-    state_distribution_analysis()
+    """
+    stream data from cloud directly to dataframe
+    """
+    func_azure_streaming()
     print("This is case 3")
     return "This is case 3"
 
 
 def handle_case_4():
-    func_azure_streaming()
+    """
+    Execute CMD command similar as the .bat files
+    which are exporting data using esExporter.exe
+    No - uploaded!
+    """
+    try:
+        func_press_direct_cmd_exporter()
+        print(f'\n\nfunc_press_direct_cmd_exporter Succeed!!!')
+    except Exception as ex:
+        print(f'Exception: func_press_direct_cmd_exporter Failed')
+        print(ex)
+
+    try:
+        func_azure_uploader(upload_source_path=path_config['PushExpDataPathRelCMD'])
+        print(f'\n\nfunc_azure_uploader Succeed!!!')
+    except Exception as ex:
+        print(f'Exception: func_azure_uploader Failed')
+        print(ex)
+
     print("This is case 4")
     return "This is case 4"
 
 
 def handle_case_5():
-    try:
-        func_execute_bat_files()
-    except Exception as ex:
-        print(f'Exception: func_execute_bat_files Failed')
-        print(ex)
+    # state_distribution_analysis()
     print("This is case 5")
     return "This is case 5"
 
