@@ -1,5 +1,6 @@
 from src.util.azure import *
-from src.util.stateDistribution import *
+from src.util.pyqt_geo_manager import *
+from src.util.utilitiesFunctions import *
 
 
 def button_switch_case(case_value):
@@ -18,8 +19,6 @@ def button_switch_case(case_value):
     handler()
     print(f"Button {case_value} was clicked!!!")
     return
-    # # Execute the function
-    # return handler()
 
 
 ################################################################################################################################
@@ -27,36 +26,51 @@ def handle_case_1():
     """
     Execute direct .bat files which are exporting data using esExporter.exe, then pull files to azure
     """
+    print("\n### This is case 1 ###\n")
+    case_1_path = path_config['PushExpDataPathRel']
     try:
         func_execute_bat_files()
         print(f'\nfunc_execute_bat_files Succeed!!!')
     except Exception as ex:
         print(f'Exception: func_execute_bat_files Failed')
         print(ex)
+
     try:
-        func_azure_uploader(upload_source_path=path_config['PushExpDataPathRel'])
+        func_rename_files_get_sn(dir_path=case_1_path)
+        print(f'\nfunc_rename_files_get_sn Succeed!!!')
+    except Exception as ex:
+        print(f'Exception: func_rename_files_get_sn Failed')
+        print(ex)
+
+    try:
+        func_azure_uploader(upload_source_path=case_1_path)
         print(f'\nfunc_azure_uploader Succeed!!!')
     except Exception as ex:
         print(f'Exception: func_azure_uploader Failed')
         print(ex)
+        return
 
     print("\n\nCase 1 Done")
-    return "This is case 1"
+    return
 
 
 def handle_case_2():
+    print("\n### This is case 2 ###\n")
     func_azure_downloader()
-    print("This is case 2")
-    return "This is case 2"
+
+    print("\n\nCase 2 Done")
+    return
 
 
 def handle_case_3():
     """
     stream data from cloud directly to dataframe
     """
+    print("\n### This is case 3 ###\n")
     func_azure_streaming()
-    print("This is case 3")
-    return "This is case 3"
+
+    print("\n\nCase 3 Done")
+    return
 
 
 def handle_case_4():
@@ -65,38 +79,68 @@ def handle_case_4():
     which are exporting data using esExporter.exe
     No - uploaded!
     """
+    case_4_path = path_config['PushExpDataPathRelCMD']
+
+    print("\n### This is case 4 ###\n")
     try:
         func_press_direct_cmd_exporter()
-        print(f'\n\nfunc_press_direct_cmd_exporter Succeed!!!')
+        print(f'\nfunc_press_direct_cmd_exporter Completed!!!')
     except Exception as ex:
-        print(f'Exception: func_press_direct_cmd_exporter Failed')
+        print(f'\nException: func_press_direct_cmd_exporter Failed')
         print(ex)
 
     try:
-        func_azure_uploader(upload_source_path=path_config['PushExpDataPathRelCMD'])
-        print(f'\n\nfunc_azure_uploader Succeed!!!')
+        func_rename_files_get_sn(dir_path=case_4_path)
+        print(f'\nfunc_rename_files_get_sn Succeed!!!')
+    except Exception as ex:
+        print(f'Exception: func_rename_files_get_sn Failed')
+        print(ex)
+
+    try:
+        func_azure_uploader(upload_source_path=case_4_path)
+        print(f'\nfunc_azure_uploader Succeed!!!')
     except Exception as ex:
         print(f'Exception: func_azure_uploader Failed')
         print(ex)
 
-    print("This is case 4")
-    return "This is case 4"
+    print("\n\nCase 4 Done")
+    return
 
 
 def handle_case_5():
-    # state_distribution_analysis()
-    print("This is case 5")
-    return "This is case 5"
+    print("\n### This is case 5 ###\n")
+    try:
+        func_azure_uploader(upload_source_path=path_config['PushExpDataPathRel'])
+        print(f"\nfunc_azure_uploader with {path_config['PushExpDataPathRel']} Completed!!!")
+    except Exception as ex:
+        print(f'Exception: func_azure_uploader Failed')
+        print(ex)
+        return
+
+    try:
+        func_azure_uploader(upload_source_path=path_config['PushExpDataPathRelCMD'])
+        print(f"\nfunc_azure_uploader with {path_config['PushExpDataPathRelCMD']} Completed!!!")
+    except Exception as ex:
+        print(f'Exception: func_azure_uploader Failed')
+        print(ex)
+        return
+
+    print("\n\nCase 5 Done")
+    return
 
 
 def handle_case_6():
+    func_run_free_cmd_command()
     print("This is case 6")
-    return "This is case 6"
+
+    print("\n\nCase 6 Done")
+    return
 
 
 def handle_case_7():
     print("This is case 7")
-    return "This is case 7"
+    print("\n\nCase 7 Done")
+    return
 
 
 def handle_default():
