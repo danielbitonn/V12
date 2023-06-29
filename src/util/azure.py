@@ -1,10 +1,13 @@
-import datetime
-import subprocess
-import sys
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 import pandas as pd
-from io import BytesIO
+import subprocess
+import datetime
+import socket
+import sys
 import os
+
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+from io import BytesIO
+from src.util.utilitiesFunctions import *
 from config_manager import *
 
 # Load the configuration variables
@@ -16,9 +19,7 @@ batsFiles_config = config_variables['batsFiles']
 cmdCommands_config = config_variables['cmdCommands']
 
 
-# TODO: create 24h/48h/week extractor
-
-def generate_unique_name(base_name, existing_names):
+def generate_unique_name(base_name, existing_names, dirPath):
     base_name_without_ext = os.path.splitext(base_name)[0]
     extension = os.path.splitext(base_name)[1]
 
@@ -32,6 +33,12 @@ def generate_unique_name(base_name, existing_names):
     while unique_name in existing_names:
         unique_name = f"{base_name_without_ext}_{i}{extension}"
         i += 1
+
+        # Construct full file paths
+        old_filepath = os.path.join(dirPath, base_name)
+        new_filepath = os.path.join(dirPath, unique_name)
+        # Rename the file
+        os.rename(old_filepath, new_filepath)
 
     return unique_name
 
@@ -49,13 +56,13 @@ def func_load_data_from_blob(blob_service_client, container_name, blob_name):
 
 
 def func_press_direct_cmd_exporter():
-    output_path = path_config['PushExpDataPathRelCMD']
     exporter_path = path_config['PressEsExporter']
+    output_path = path_config['PushExpDataPathRelCMD']
+    mode_of_cmd_exporter = cmdCommands_config['exportMode']
+    start_time = '00:01'
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
-
-    start_time = '00:01'
 
     from_time = sys.argv[1] if len(sys.argv) > 1 else start_time  # check for command line argument for reference time!
     now = datetime.datetime.now()  # get current date and time
@@ -73,22 +80,18 @@ def func_press_direct_cmd_exporter():
     nameable_time2 = mytime.replace(':', '.')  # format time as HH.MM
     nameable_from = from_time.replace(':', '.')  # format from_time as HH.MM
 
-    # create directory if it doesn't exist
-    # if not os.path.exists(path_config['exportedData']):
-    #     os.makedirs(path_config['exportedData'])
-
     for src in indexes_config:
         try:
-            # cmd = f"{path_config['PressEsExporter']} -i {indexes_config[src]} -f {mydate}T{nameable_from} -t {mydate}T{nameable_time2} -o {path_config['exDataPath']}"
-            # cmd = f"{exporter_path} -i {indexes_config[src]} -f {mydate}T{nameable_from} -t {mydate}T{nameable_time2} -o {output_path}"
-            cmd = f"{cmdCommands_config['cmdExporterPath']} -i {indexes_config[src]} -f {cmdCommands_config['cmdMyDate']}T{cmdCommands_config['cmdFromTime']} -t {cmdCommands_config['cmdMyDate']}T{cmdCommands_config['cmdToTime']} -o {output_path}"
+            if len(mode_of_cmd_exporter):  # relative
+                cmd = f"{exporter_path} -i {indexes_config[src]} -f {mydate}T{nameable_from} -t {mydate}T{nameable_time2} -o {output_path}"
+            else:  # absolute
+                cmd = f"{exporter_path} -i {indexes_config[src]} -f {cmdCommands_config['cmdMyDate']}T{cmdCommands_config['cmdFromTime']} -t {cmdCommands_config['cmdMyDate']}T{cmdCommands_config['cmdToTime']} -o {output_path}"
 
-            print(f'extract {src} with:\n{cmd}\n')
-            # subprocess.call(cmd, shell=True)
+            print(f'extract {indexes_config[src]}...')
             subprocess.run(["cmd.exe", "/c", cmd], shell=True)
 
         except Exception as ex:
-            print(f'\nException: func_export_data Failed with {src}\n')
+            print(f'\nException: func_export_data Failed with {src}')
             print(ex)
 
 
@@ -102,36 +105,35 @@ def func_azure_uploader(upload_source_path):
         blob_service_client = BlobServiceClient.from_connection_string(connect_str)
         container_name = azure_config['container_name']
 
-        print("\nconnect_phase_success\n")
         # Check list of the files in the container
-        # container_client = blob_service_client.get_container_client(container_name)
-        # existing_blobs = [blob.name for blob in container_client.list_blobs()]
+        container_client = blob_service_client.get_container_client(container_name)
+        existing_blobs = [blob.name for blob in container_client.list_blobs()]
 
     except Exception as ex:
         print('\nException: func_azure_uploader - Connection Client Failed')
         print(ex)
 
-    try:
-        # for fileName in indexes_config:
-        for fileName in file_list:
-            # # Generate unique blob name - OLD
-            # base_blob_name = fileName
-            # blob_name = generate_unique_name(base_blob_name, existing_blobs)
-            # print("\nUploading to Azure Storage as blob:\n\t" + blob_name)
+    for fileName in file_list:
+        try:
+            if fileName in existing_blobs:
+                fileName = generate_unique_name(fileName, existing_blobs, dirPath=upload_source_path)
+                print("\nUploading to Azure Storage as blob:\n\t" + fileName)
 
-            # # Upload the created file - OLD
-            # blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
-            # with open(f"{path_config['exportedData']}{base_blob_name}.csv", "rb") as data:
-            #     blob_client.upload_blob(data)
-
+            connect_str = azure_config['connect_str']
+            blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+            container_name = azure_config['container_name']
             blob_client = blob_service_client.get_blob_client(container=container_name, blob=fileName)
-            with open(f"{upload_source_path}{fileName}", "rb") as data:
-                blob_client.upload_blob(data)
-            print(f"\n{fileName} Uploaded!\n")
+            print("connected")
 
-    except Exception as ex:
-        print('\nException: func_azure_uploader Failed in the Streaming-Downloading step')
-        print(ex)
+            with open(f"{upload_source_path}{fileName}", "rb") as data:
+                print("uploading...")
+                blob_client.upload_blob(data)
+            print(f"{fileName} Uploaded!\n")
+
+        except Exception as ex:
+            print('\nException: func_azure_uploader Failed in the Streaming-Downloading step')
+            print(ex)
+            pass
 
 
 def func_azure_downloader():
@@ -147,7 +149,7 @@ def func_azure_downloader():
         print("\nconnect_phase_success\n")
 
     except Exception as ex:
-        print('\nException: func_azure_downloader - Connection Client Failed')
+        print('\nException: func_azure_downloader - Connection Client Failed !!!')
         print(ex)
 
     try:
@@ -163,7 +165,7 @@ def func_azure_downloader():
             with open(download_path, "wb") as download_file:
                 data = blob_client.download_blob().readall()
                 download_file.write(data)
-            print(f"{blob.name} Downloaded\n")
+            print(f"{blob.name} has been downloaded!\n")
 
             # TODO: rename! based on blob.name and clean by the "__"
     except Exception as ex:
@@ -196,7 +198,7 @@ def func_azure_streaming():
         formatted_date = current_date.strftime('%Y-%m-%d_%H-%M-%S')
 
         for file in existing_blobs:
-            df_name = file.split("__")[0]
+            df_name = file.split(f"{azure_config['dfSeparator']}")[0]
             df_name = f'{df_name}_{formatted_date}'
             try:
                 DFs[df_name] = func_load_data_from_blob(blob_service_client, container_name, file)
@@ -219,7 +221,7 @@ def func_execute_bat_files():
     for batFile in batsFiles_config:
         try:
             subprocess.run(["cmd.exe", "/c", batsFiles_config[batFile]], shell=True)
-            # print(f'\nSuccess - {batsFiles_config[batFile]}\n')
+            print(f'\nSuccess - {batsFiles_config[batFile]}\n')
         except Exception as ex:
             print(f'Exception: func_execute_bat_files Failed with {batsFiles_config[batFile]}')
             print(ex)

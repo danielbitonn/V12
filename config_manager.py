@@ -9,5 +9,7 @@ def func_read_config():
         'indexes': conf['indexes'],
         'paths': conf['paths'],
         'batsFiles': conf['batsFiles'],
-        'cmdCommands': conf['cmdCommands']
+        'cmdCommands': conf['cmdCommands'],
+        'vers': conf['vers'],
+        'freecmd': conf['freecmd']
     }
