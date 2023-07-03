@@ -7,7 +7,7 @@ class MainWindow:
         self.root = root
         self.root.title("Daily Report V12")
         self.root.geometry("1200x600")
-        self.root.iconbitmap('src/ref/media/v12.ico')
+        self.root.iconbitmap('src/_ref_/media/v12.ico')
 
         # Frame to hold other widgets
         self.frame = Frame(root)

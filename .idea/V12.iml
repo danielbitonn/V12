@@ -11,10 +11,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/V12Daily" />
       <excludeFolder url="file://$MODULE_DIR$/build/V12Daily/localpycs" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.7 (VenvPy37V12)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.11 (VenvPy311) (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-  </component>
-  <component name="PackageRequirementsSettings">
-    <option name="removeUnused" value="true" />
   </component>
 </module>

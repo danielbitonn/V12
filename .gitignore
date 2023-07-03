@@ -5,4 +5,4 @@ config/
 **/conf.json
 dist/
 build/
-bats/
+data/

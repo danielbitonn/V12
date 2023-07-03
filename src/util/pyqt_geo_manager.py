@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
                     600)  # self.setFixedSize(800, 600) #  fix the size of the window and prevent the user resizing
 
         # Set window icon
-        self.setWindowIcon(QIcon('src/ref/media/v12.ico'))
+        self.setWindowIcon(QIcon('src/_ref_/media/v12.ico'))
 
         self.mdi = QMdiArea()
         self.setCentralWidget(self.mdi)
@@ -40,7 +40,8 @@ class MainWindow(QMainWindow):
         self.add_widget(QPushButton, "\nDirect CMD commands exporter\n", 4, 0, lambda: self.button_clicked(4))
         self.add_widget(QPushButton, "\nfunc_azure_uploader\n", 5, 0, lambda: self.button_clicked(5))
         self.add_widget(QPushButton, "\nFree CMD command\n", 6, 0, lambda: self.button_clicked(6))
-        self.add_widget(QPushButton, "\nNone\n", 7, 0, lambda: self.button_clicked(7))
+        self.add_widget(QPushButton, "\nSandBox_Timeline_Report\n", 7, 0, lambda: self.button_clicked(7))
+        self.add_widget(QPushButton, "\nSandBox\n", 8, 0, lambda: self.button_clicked(8))
 
         # create subwindow object
         subwindow = QMdiSubWindow()

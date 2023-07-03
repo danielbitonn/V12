@@ -80,7 +80,7 @@ def visual_interactive_graph(df):
 
 def state_distribution_analysis():
     # Importing Data
-    df = pd.read_csv(find_rel_path(file_name="../dataAnalysis/test_to_gcsteamcont.csv"))
+    df = pd.read_csv(find_rel_path(file_name="../../data/test_to_gcsteamcont.csv"))
 
     # Convert the 'time' column to datetime objects, convert to the desired timezone, and remove timezone information
     df['time'] = pd.to_datetime(df['PlcTime']).dt.tz_localize(None)

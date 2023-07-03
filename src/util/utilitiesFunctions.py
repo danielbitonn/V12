@@ -37,5 +37,4 @@ def func_rename_files_get_sn(dir_path):
             # Rename the file
             os.rename(old_filepath, new_filepath)
             print(f"{old_filepath} - renamed to:\n{new_filepath}\n")
-
     return
