@@ -140,7 +140,7 @@ def func_azure_downloader():
     downloaded_file_path = path_config['PullExpDataPathRel']
 
     if not os.path.exists(downloaded_file_path):
-        os.mkdir(downloaded_file_path)
+        os.makedirs(downloaded_file_path)
 
     try:
         connect_str = azure_config['connect_str']

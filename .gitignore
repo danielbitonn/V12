@@ -6,3 +6,4 @@ config/
 dist/
 build/
 bats/
+data/

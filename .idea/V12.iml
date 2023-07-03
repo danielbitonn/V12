@@ -2,16 +2,16 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/venv" />
-      <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/build/V12Daily" />
+      <excludeFolder url="file://$MODULE_DIR$/build/side" />
       <excludeFolder url="file://$MODULE_DIR$/build/main/localpycs" />
       <excludeFolder url="file://$MODULE_DIR$/build/my_executable/localpycs" />
-      <excludeFolder url="file://$MODULE_DIR$/build/V12App/localpycs" />
-      <excludeFolder url="file://$MODULE_DIR$/build/side" />
-      <excludeFolder url="file://$MODULE_DIR$/build/V12Daily" />
+      <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/build/V12Daily/localpycs" />
+      <excludeFolder url="file://$MODULE_DIR$/build/V12App/localpycs" />
+      <excludeFolder url="file://$MODULE_DIR$/dist" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.7 (VenvPy37V12)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.11 (v12venv311)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PackageRequirementsSettings">
