@@ -11,5 +11,6 @@ def func_read_config():
         'batsFiles': conf['batsFiles'],
         'cmdCommands': conf['cmdCommands'],
         'vers': conf['vers'],
-        'freecmd': conf['freecmd']
+        'freecmd': conf['freecmd'],
+        'presses': conf['presses']
     }

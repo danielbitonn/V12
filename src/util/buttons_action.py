@@ -58,8 +58,9 @@ def handle_case_1():
 
 def handle_case_2():
     print("\n### This is case 2 ###\n")
-    func_azure_downloader()
-
+    downPath = os.path.join(path_config['PullExpDataPathRel'], func_remove_symbols(socket.getfqdn()))
+    print(downPath)
+    func_azure_downloader(downloadedFilesPath=downPath)
     print("\n\nCase 2 Done")
     return
 

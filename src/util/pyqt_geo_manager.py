@@ -1,15 +1,18 @@
-from PyQt5.QtWidgets import QWidget, QFileDialog, QApplication, QMainWindow, QLabel, \
-    QGridLayout, QVBoxLayout, QWidget, \
-    QPushButton, QMdiArea, QMdiSubWindow, QMessageBox
-
+import logging
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import \
+    QWidget, QFileDialog, QApplication, QMainWindow, QLabel, QGridLayout, QVBoxLayout, \
+    QPushButton, QMdiArea, QMdiSubWindow, QMessageBox, QPlainTextEdit, QComboBox
 from PyQt5.QtGui import QIcon
 from src.util.buttons_action import *
+from config_manager import *
+import json
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        # Set window title
+
         self.setWindowTitle("Daily Report V12")
         self.resize(1200,
                     600)  # self.setFixedSize(800, 600) #  fix the size of the window and prevent the user resizing
@@ -31,6 +34,48 @@ class MainWindow(QMainWindow):
         self.add_widget(QLabel, "Report Functionality", 0, 0)
 
         self.class_buttons_creator()
+
+        '''
+        ##################################################
+        ##################################################
+        ##################################################
+        '''
+        # Create QPlainTextEdit for logs and add it to layout
+        self.log_widget = QPlainTextEdit()
+        self.log_widget.setReadOnly(True)
+        self.layout.addWidget(self.log_widget, 30, 0)
+
+        # Create a handler for logging
+        self.log_handler = QTextEditLogger(self.log_widget)
+        self.log_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        logging.getLogger().addHandler(self.log_handler)
+        logging.getLogger().setLevel(logging.DEBUG)
+
+        with open('conf.json', 'r') as config_file:
+            self.conf_press = json.load(config_file)
+
+        # Create QComboBox for press selection and add it to layout
+        self.press_combo_box = QComboBox()
+        self.press_combo_box.addItems(self.conf_press['presses'])
+        self.press_combo_box.currentTextChanged.connect(self.press_changed)
+        self.layout.addWidget(self.press_combo_box, 10, 0)
+
+        with open('log.json', 'r') as log_file:
+            self.log_app = json.load(log_file)
+
+    @pyqtSlot(str)
+    def press_changed(self, text):
+        logging.info('Press changed to: ' + text)
+        self.log_app['current_press'] = text
+        self.log_app['press_sn'] = socket.getfqdn()
+        with open('log.json', 'w') as f:
+            json.dump(self.log_app, f)
+
+    '''
+    ##################################################
+    ##################################################
+    ##################################################
+    '''
 
     def class_buttons_creator(self):
         # TODO: Create an automation
@@ -71,7 +116,18 @@ class MainWindow(QMainWindow):
             widget.clicked.connect(action)
 
 
+class QTextEditLogger(logging.Handler):
+    def __init__(self, parent):
+        super().__init__()
+        self.widget = parent
+
+    def emit(self, record):
+        msg = self.format(record)
+        self.widget.appendPlainText(msg)
+
+
 def execute_app():
+    pressSN = socket.getfqdn()
     app = QApplication([])
     win = MainWindow()
     win.show()
