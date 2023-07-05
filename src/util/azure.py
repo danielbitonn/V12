@@ -1,12 +1,14 @@
 import pandas as pd
-import subprocess
+# import subprocess
 import datetime
-import socket
+# import socket
 import sys
-import os
+# import os
 
+from azure.core.exceptions import ResourceNotFoundError
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 from io import BytesIO
+
 from src.util.utilitiesFunctions import *
 from config_manager import *
 
@@ -17,6 +19,27 @@ indexes_config = config_variables['indexes']
 path_config = config_variables['paths']
 batsFiles_config = config_variables['batsFiles']
 cmdCommands_config = config_variables['cmdCommands']
+
+
+def func_azure_container_connect():
+    connect_str = azure_config['connect_str']
+    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+
+    # container_name = func_remove_symbols(socket.getfqdn())
+    container_name = func_remove_symbols(func_read_log_json()['current_press'])
+    container_client = blob_service_client.get_container_client(container_name)
+
+    try:
+        # If the container does not exist, a ResourceNotFoundError will be thrown
+        container_client.get_container_properties()
+        print(f'{container_client} is exist!')
+    except ResourceNotFoundError:
+        print(f"{container_client} isn\'t exist >>> creating container!")
+        # Create the container if it does not exist
+        blob_service_client.create_container(container_name)
+
+    print("\nCONNECT-CONTAINER-SUCCEED\n")
+    return blob_service_client, container_client, container_name
 
 
 def generate_unique_name(base_name, existing_names, dirPath):
@@ -96,78 +119,71 @@ def func_press_direct_cmd_exporter():
 
 
 def func_azure_uploader(upload_source_path):
+    if not os.path.exists(upload_source_path):
+        os.makedirs(upload_source_path)
+
     file_list = [f for f in os.listdir(upload_source_path)
                  if os.path.isfile(os.path.join(upload_source_path, f))]
     print(f'Exported files:\n{file_list}')
 
-    try:
-        connect_str = azure_config['connect_str']
-        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-        container_name = azure_config['container_name']
+    if len(file_list) > 0:
 
-        # Check list of the files in the container
-        container_client = blob_service_client.get_container_client(container_name)
+        try:
+            blob_service_client, container_client, container_name = func_azure_container_connect()  # return blob_service_client, container_client, container_name
+        except Exception as ex:
+            print(f">>> Connection Failed:\n>>>{ex}\n(func_azure_container_connect):\n{blob_service_client}\n{container_client}\n{container_name}\n")
+
         existing_blobs = [blob.name for blob in container_client.list_blobs()]
 
-    except Exception as ex:
-        print('\nException: func_azure_uploader - Connection Client Failed')
-        print(ex)
+        for fileName in file_list:
+            try:
+                if fileName in existing_blobs:
+                    # TODO: duplicated files to azure with numbers at the end
+                    fileName = generate_unique_name(fileName, existing_blobs, dirPath=upload_source_path)
+                    print("\nUploading to Azure Storage as blob:\n\t" + fileName)
 
-    for fileName in file_list:
-        try:
-            if fileName in existing_blobs:
-                fileName = generate_unique_name(fileName, existing_blobs, dirPath=upload_source_path)
-                print("\nUploading to Azure Storage as blob:\n\t" + fileName)
+                try:
+                    blob_service_client, container_client, container_name = func_azure_container_connect()  # return blob_service_client, container_client, container_name
+                except Exception as ex:
+                    print(f">>> Connection Failed:\n>>>{ex}\n(func_azure_container_connect):\n{blob_service_client}\n{container_client}\n{container_name}\n")
 
-            connect_str = azure_config['connect_str']
-            blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-            container_name = azure_config['container_name']
-            blob_client = blob_service_client.get_blob_client(container=container_name, blob=fileName)
-            print("connected")
+                # connect_str = azure_config['connect_str']
+                # blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+                # container_name = azure_config['container_name']
 
-            with open(f"{upload_source_path}{fileName}", "rb") as data:
-                print("uploading...")
-                blob_client.upload_blob(data)
-            print(f"{fileName} Uploaded!\n")
+                blob_client = blob_service_client.get_blob_client(container=container_name, blob=fileName)
+                print("connected")
 
-        except Exception as ex:
-            print('\nException: func_azure_uploader Failed in the Streaming-Downloading step')
-            print(ex)
-            pass
+                with open(f"{upload_source_path}{fileName}", "rb") as data:
+                    print("uploading...")
+                    blob_client.upload_blob(data)
+                print(f">>> Done! {fileName} uploaded!\n")
+
+            except Exception as ex:
+                print('\nException: func_azure_uploader Failed in the Streaming-Downloading step')
+                print(ex)
+                pass
+    else:
+        print('Exported files directory is empty!\n')
 
 
-def func_azure_downloader():
-    downloaded_file_path = path_config['PullExpDataPathRel']
-
-    if not os.path.exists(downloaded_file_path):
-        os.makedirs(downloaded_file_path)
-
+def func_azure_downloader(downloadedFilesPath):
+    if not os.path.exists(downloadedFilesPath):
+        os.makedirs(downloadedFilesPath)
     try:
-        connect_str = azure_config['connect_str']
-        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-        container_name = azure_config['container_name']
-        print("\nconnect_phase_success\n")
-
+        blob_service_client, container_client, container_name = func_azure_container_connect()     # return blob_service_client, container_client, container_name
     except Exception as ex:
-        print('\nException: func_azure_downloader - Connection Client Failed !!!')
-        print(ex)
-
+        print(f">>> Connection Failed:\n>>>{ex}\n(func_azure_container_connect):\n{blob_service_client}\n{container_client}\n{container_name}\n")
     try:
-        container_client = blob_service_client.get_container_client(container_name)
         blob_list = container_client.list_blobs()
-        print(blob_list)
-
         for blob in blob_list:
-            download_path = os.path.join(downloaded_file_path, blob.name)
-
-            print(f"Downloading {blob.name} to {downloaded_file_path}")
-            blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob.name)
+            download_path = os.path.join(downloadedFilesPath, blob.name)
+            print(f"Downloading {blob.name} to {downloadedFilesPath}")
+            blob_f = blob_service_client.get_blob_client(container=container_name, blob=blob.name)
             with open(download_path, "wb") as download_file:
-                data = blob_client.download_blob().readall()
+                data = blob_f.download_blob().readall()
                 download_file.write(data)
             print(f"{blob.name} has been downloaded!\n")
-
-            # TODO: rename! based on blob.name and clean by the "__"
     except Exception as ex:
         print('Exception: func_azure_downloader Failed in download phase')
         print(ex)

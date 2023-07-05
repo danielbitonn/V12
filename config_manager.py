@@ -11,5 +11,12 @@ def func_read_config():
         'batsFiles': conf['batsFiles'],
         'cmdCommands': conf['cmdCommands'],
         'vers': conf['vers'],
-        'freecmd': conf['freecmd']
+        'freecmd': conf['freecmd'],
+        'presses': conf['presses']
     }
+
+
+def func_read_log_json():
+    with open('log.json', 'r') as log_file:
+        log_conf = json.load(log_file)
+    return log_conf

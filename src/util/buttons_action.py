@@ -1,6 +1,7 @@
 from src.util.azure import *
 from src.util.pyqt_geo_manager import *
 from src.util.utilitiesFunctions import *
+import subprocess
 
 
 def button_switch_case(case_value):
@@ -12,6 +13,7 @@ def button_switch_case(case_value):
         5: handle_case_5,
         6: handle_case_6,
         7: handle_case_7,
+        8: handle_case_8,
     }
     # Get the function from switcher dictionary with the case_value as a key
     # (default to handle_default function if case_value not found)
@@ -30,23 +32,23 @@ def handle_case_1():
     case_1_path = path_config['PushExpDataPathRel']
     try:
         func_execute_bat_files()
-        print(f'\nfunc_execute_bat_files Succeed!!!')
+        print(f'>>>: func_execute_bat_files Succeed!!!')
     except Exception as ex:
-        print(f'Exception: func_execute_bat_files Failed')
+        print(f'Exception: >>> func_execute_bat_files Failed')
         print(ex)
 
     try:
         func_rename_files_get_sn(dir_path=case_1_path)
-        print(f'\nfunc_rename_files_get_sn Succeed!!!')
+        print(f'>>>: func_rename_files_get_sn Succeed!!!')
     except Exception as ex:
-        print(f'Exception: func_rename_files_get_sn Failed')
+        print(f'Exception: >>> func_rename_files_get_sn Failed')
         print(ex)
 
     try:
         func_azure_uploader(upload_source_path=case_1_path)
-        print(f'\nfunc_azure_uploader Succeed!!!')
+        print(f'>>>func_azure_uploader Succeed!!!')
     except Exception as ex:
-        print(f'Exception: func_azure_uploader Failed')
+        print(f'Exception: >>> func_azure_uploader Failed')
         print(ex)
         return
 
@@ -56,8 +58,10 @@ def handle_case_1():
 
 def handle_case_2():
     print("\n### This is case 2 ###\n")
-    func_azure_downloader()
-
+    # downPath = os.path.join(path_config['PullExpDataPathRel'], func_remove_symbols(socket.getfqdn()))
+    downPath = os.path.join(path_config['PullExpDataPathRel'], func_remove_symbols(func_read_log_json()['current_press']))
+    print(downPath)
+    func_azure_downloader(downloadedFilesPath=downPath)
     print("\n\nCase 2 Done")
     return
 
@@ -139,7 +143,16 @@ def handle_case_6():
 
 def handle_case_7():
     print("This is case 7")
+
+    subprocess.call(['python', 'src/gui_creator/Sandbox_timeline_report.py'])
     print("\n\nCase 7 Done")
+    return
+
+
+def handle_case_8():
+    print("This is case 8")
+    subprocess.call(['python', 'src/gui_creator/SandBox_file.py'])
+    print("\n\nCase 8 Done")
     return
 
 

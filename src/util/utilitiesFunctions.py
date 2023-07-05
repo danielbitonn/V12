@@ -9,6 +9,12 @@ freeCMD_config = config_variables['freecmd']
 azure_config = config_variables['azure']
 
 
+def func_supporter_sn():
+    with open('log.json', 'r') as log_file:
+        log_app = json.load(log_file)
+    return int(log_app['current_press'])
+
+
 def func_run_free_cmd_command():
     try:
         cmd = f"{freeCMD_config['comm']}"
@@ -37,5 +43,8 @@ def func_rename_files_get_sn(dir_path):
             # Rename the file
             os.rename(old_filepath, new_filepath)
             print(f"{old_filepath} - renamed to:\n{new_filepath}\n")
-
     return
+
+
+def func_remove_symbols(input_string):
+    return ''.join(char.lower() for char in input_string if char.isalnum())

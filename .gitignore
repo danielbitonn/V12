@@ -5,5 +5,7 @@ config/
 **/conf.json
 dist/
 build/
-bats/
 data/
+_ref_/
+
+
