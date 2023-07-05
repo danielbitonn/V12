@@ -57,6 +57,7 @@ class MainWindow(QMainWindow):
         # Create QComboBox for press selection and add it to layout
         self.press_combo_box = QComboBox()
         self.press_combo_box.addItems(self.conf_press['presses'])
+        self.press_combo_box.setCurrentText(func_read_log_json()['current_press'])
         self.press_combo_box.currentTextChanged.connect(self.press_changed)
         self.layout.addWidget(self.press_combo_box, 10, 0)
 
@@ -81,12 +82,12 @@ class MainWindow(QMainWindow):
         # TODO: Create an automation
         self.add_widget(QPushButton, "\nBats files executes\nAzure uploader\n", 1, 0, lambda: self.button_clicked(1))
         self.add_widget(QPushButton, "\nAzure files downloader\n", 2, 0, lambda: self.button_clicked(2))
-        self.add_widget(QPushButton, "\nStreaming Azure to DFs\n", 3, 0, lambda: self.button_clicked(3))
-        self.add_widget(QPushButton, "\nDirect CMD commands exporter\n", 4, 0, lambda: self.button_clicked(4))
-        self.add_widget(QPushButton, "\nfunc_azure_uploader\n", 5, 0, lambda: self.button_clicked(5))
-        self.add_widget(QPushButton, "\nFree CMD command\n", 6, 0, lambda: self.button_clicked(6))
-        self.add_widget(QPushButton, "\nSandBox_Timeline_Report\n", 7, 0, lambda: self.button_clicked(7))
-        self.add_widget(QPushButton, "\nSandBox\n", 8, 0, lambda: self.button_clicked(8))
+        # self.add_widget(QPushButton, "\nStreaming Azure to DFs\n", 3, 0, lambda: self.button_clicked(3))
+        # self.add_widget(QPushButton, "\nDirect CMD commands exporter\n", 4, 0, lambda: self.button_clicked(4))
+        # self.add_widget(QPushButton, "\nfunc_azure_uploader\n", 5, 0, lambda: self.button_clicked(5))
+        # self.add_widget(QPushButton, "\nFree CMD command\n", 6, 0, lambda: self.button_clicked(6))
+        # self.add_widget(QPushButton, "\nSandBox_Timeline_Report\n", 7, 0, lambda: self.button_clicked(7))
+        # self.add_widget(QPushButton, "\nSandBox\n", 8, 0, lambda: self.button_clicked(8))
 
         # create subwindow object
         subwindow = QMdiSubWindow()
@@ -127,7 +128,7 @@ class QTextEditLogger(logging.Handler):
 
 
 def execute_app():
-    pressSN = socket.getfqdn()
+    # pressSN = socket.getfqdn()
     app = QApplication([])
     win = MainWindow()
     win.show()

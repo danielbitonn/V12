@@ -32,23 +32,23 @@ def handle_case_1():
     case_1_path = path_config['PushExpDataPathRel']
     try:
         func_execute_bat_files()
-        print(f'\nfunc_execute_bat_files Succeed!!!')
+        print(f'>>>: func_execute_bat_files Succeed!!!')
     except Exception as ex:
-        print(f'Exception: func_execute_bat_files Failed')
+        print(f'Exception: >>> func_execute_bat_files Failed')
         print(ex)
 
     try:
         func_rename_files_get_sn(dir_path=case_1_path)
-        print(f'\nfunc_rename_files_get_sn Succeed!!!')
+        print(f'>>>: func_rename_files_get_sn Succeed!!!')
     except Exception as ex:
-        print(f'Exception: func_rename_files_get_sn Failed')
+        print(f'Exception: >>> func_rename_files_get_sn Failed')
         print(ex)
 
     try:
         func_azure_uploader(upload_source_path=case_1_path)
-        print(f'\nfunc_azure_uploader Succeed!!!')
+        print(f'>>>func_azure_uploader Succeed!!!')
     except Exception as ex:
-        print(f'Exception: func_azure_uploader Failed')
+        print(f'Exception: >>> func_azure_uploader Failed')
         print(ex)
         return
 
@@ -58,7 +58,8 @@ def handle_case_1():
 
 def handle_case_2():
     print("\n### This is case 2 ###\n")
-    downPath = os.path.join(path_config['PullExpDataPathRel'], func_remove_symbols(socket.getfqdn()))
+    # downPath = os.path.join(path_config['PullExpDataPathRel'], func_remove_symbols(socket.getfqdn()))
+    downPath = os.path.join(path_config['PullExpDataPathRel'], func_remove_symbols(func_read_log_json()['current_press']))
     print(downPath)
     func_azure_downloader(downloadedFilesPath=downPath)
     print("\n\nCase 2 Done")
