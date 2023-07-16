@@ -36,9 +36,9 @@ class MainWindow(QMainWindow):
         self.class_buttons_creator()
 
         '''
-        ##################################################
-        ##################################################
-        ##################################################
+        ################################################################################################################
+        ################################################################################################################
+        ################################################################################################################
         '''
         # Create QPlainTextEdit for logs and add it to layout
         self.log_widget = QPlainTextEdit()
@@ -73,20 +73,20 @@ class MainWindow(QMainWindow):
             json.dump(self.log_app, f)
 
     '''
-    ##################################################
-    ##################################################
-    ##################################################
+    ####################################################################################################################
+    ####################################################################################################################
+    ####################################################################################################################
     '''
 
     def class_buttons_creator(self):
         # TODO: Create an automation
         self.add_widget(QPushButton, "\nBats files executes\nAzure uploader\n", 1, 0, lambda: self.button_clicked(1))
         self.add_widget(QPushButton, "\nAzure files downloader\n", 2, 0, lambda: self.button_clicked(2))
-        # self.add_widget(QPushButton, "\nStreaming Azure to DFs\n", 3, 0, lambda: self.button_clicked(3))
+        self.add_widget(QPushButton, "\nDaily Report Beta\n", 3, 0, lambda: self.button_clicked(3))
         # self.add_widget(QPushButton, "\nDirect CMD commands exporter\n", 4, 0, lambda: self.button_clicked(4))
         # self.add_widget(QPushButton, "\nfunc_azure_uploader\n", 5, 0, lambda: self.button_clicked(5))
         # self.add_widget(QPushButton, "\nFree CMD command\n", 6, 0, lambda: self.button_clicked(6))
-        # self.add_widget(QPushButton, "\nSandBox_Timeline_Report\n", 7, 0, lambda: self.button_clicked(7))
+        # self.add_widget(QPushButton, "\nStreaming Azure to DFs\n", 7, 0, lambda: self.button_clicked(7))
         # self.add_widget(QPushButton, "\nSandBox\n", 8, 0, lambda: self.button_clicked(8))
 
         # create subwindow object

@@ -1,59 +1,90 @@
-from src.util.pyqt_geo_manager import *
-from src.util.automaticScript import *
-import threading
-import socket
-import csv
+from venv import logger
+
+from src.util.tkinter_gui_manager import execute_app  # from src.util.pyqt_geo_manager import execute_app
+from src.AutomationScriptsDir.auto_write_storage_containers_and_blobs_to_json import \
+    auto_write_storage_containers_and_blobs_to_json
+from src.util.utilitiesFunctions import *
+
+import json
 import datetime
+import logging
 import sys
-import io
+import traceback
 
 
-class OutputLogger(io.TextIOBase):
-    def __init__(self, csv_file_name):
-        self.csv_file_name = csv_file_name
+class LoggerWriter:
+    def __init__(self, level, logger):
+        self.level = level
+        self.logger = logger
 
     def write(self, message):
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        data = {
-            'timestamp': timestamp,
-            'type': 'print',
-            'data': message.rstrip()
-        }
-        with open(self.csv_file_name, 'a', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=['timestamp', 'type', 'data'])
-            if file.tell() == 0:
-                writer.writeheader()
-            writer.writerow(data)
+        if message != '\n':
+            self.logger.log(self.level, message)
 
     def flush(self):
         pass
 
 
-def setup_output_logging(csv_file_name):
-    output_logger = OutputLogger(csv_file_name)
-    sys.stdout = output_logger
-    sys.stderr = output_logger
+def func_main_logger():
+    """
+    ### Now you can log messages like this:
+    logger.info('This is an info message.')
+    logger.error('This is an error message.')
+    try:
+        1 / 0
+    except Exception as ex:
+        logger.error(f"Exception: XXX_function has been failed: >>> {ex} >>> {traceback.extract_tb(list(sys.exc_info())[2])}")
+    """
+    # Logger Name
+    logger_name = f'{fjp()["paths"]["PushExpDataPathRel"]}/{fjp(jsname="log.json")["current_press"]}/{load_json("log.json")["current_press"]}_{datetime.datetime.now().strftime("%Y-%m-%d")}_{load_json("conf.json")["logApp"]["AppLogName"]}'
+    # Set up the logger
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.DEBUG)
+    # Create a file handler
+    handler = logging.FileHandler(f'{logger_name}.csv')
+    handler.setLevel(logging.NOTSET)
+    # Create a logging format
+    formatter = CustomFormatter()
+    handler.setFormatter(formatter)
+    # Add the handlers to the logger
+    logger.addHandler(handler)
+    # Redirect stdout and stderr
+    sys.stdout = LoggerWriter(logging.INFO, logger)
+    sys.stderr = LoggerWriter(logging.ERROR, logger)
 
 
-def sub_processes(tar, nm):
-    background_thread = threading.Thread(target=tar)
-    background_thread.daemon = True
-    background_thread.start()
-    print(f"{nm} is running...")
-    return background_thread
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
 
 
 if __name__ == '__main__':
-    # Logger
-    # setup_output_logging(csv_file_name=config_variables["vers"]["logger"])
+    # TODO: Manage all folders and utilities files before running the main()
+    # TODO: Delete folders which are older then 1 week.
+    # TODO: Adding timeFrame availability
+    # TODO:
 
-    # subprocess - automaticScripts_main
-    bkg_thread = sub_processes(tar=automaticScript_main, nm='automaticScript_main')
-    # BUG: csd
-    # HACK: cdosvjkmldf
-    json_str = json.dumps(config_variables, indent=4)
-    print(json_str)
+    # 1. Logger Initializing
+    func_main_logger()
+    # 2. Main application
+    bkg_thread_00 = func_sub_processes(tar=execute_app, nm='execute_app')
 
-    execute_app()
+    # 3. Reading JSONs
+    logger.info(fjp('conf.json'))
+    logger.info(fjp('log.json')['current_press'])
+    print(json.dumps(config_variables, indent=4))
 
-    bkg_thread.join()
+    # 4. Getting Data from Azure
+    try:
+        bkg_thread_01 = func_sub_processes(tar=auto_write_storage_containers_and_blobs_to_json,
+                                           nm='auto_write_storage_containers_and_blobs_to_json')
+    except Exception as ex:
+        print(f"Exception: auto_write_storage_containers_and_blobs_to_json has been failed: >>> {ex} >>> {traceback.extract_tb(list(sys.exc_info())[2])}")
+
+
+    bkg_thread_01.join()
+    bkg_thread_00.join()
+
+
+
+
