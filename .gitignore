@@ -1,11 +1,10 @@
 # .gitignore
 *.log
-tmp/
-config/
 **/conf.json
-dist/
-build/
+
+bats/_ref_/
+analysis_files/
 data/
-_ref_/
 
-
+build/
+dist/

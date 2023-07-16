@@ -1,9 +1,9 @@
 import pandas as pd
-# import subprocess
+import subprocess
 import datetime
-# import socket
+import socket
 import sys
-# import os
+import os
 
 from azure.core.exceptions import ResourceNotFoundError
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
@@ -11,6 +11,7 @@ from io import BytesIO
 
 from src.util.utilitiesFunctions import *
 from config_manager import *
+from src.util.utilitiesFunctions import func_remove_symbols
 
 # Load the configuration variables
 config_variables = func_read_config()
@@ -22,48 +23,27 @@ cmdCommands_config = config_variables['cmdCommands']
 
 
 def func_azure_container_connect():
-    connect_str = azure_config['connect_str']
-    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-
-    # container_name = func_remove_symbols(socket.getfqdn())
-    container_name = func_remove_symbols(func_read_log_json()['current_press'])
-    container_client = blob_service_client.get_container_client(container_name)
-
     try:
-        # If the container does not exist, a ResourceNotFoundError will be thrown
-        container_client.get_container_properties()
-        print(f'{container_client} is exist!')
-    except ResourceNotFoundError:
-        print(f"{container_client} isn\'t exist >>> creating container!")
-        # Create the container if it does not exist
-        blob_service_client.create_container(container_name)
+        connect_str = azure_config['connect_str']
+        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
 
-    print("\nCONNECT-CONTAINER-SUCCEED\n")
-    return blob_service_client, container_client, container_name
+        container_name = func_remove_symbols(func_read_log_json()['current_press'])
+        container_client = blob_service_client.get_container_client(container_name)
 
+        try:
+            # If the container does not exist, a ResourceNotFoundError will be thrown
+            container_client.get_container_properties()
+            print(f'{container_client} is exist!')
+        except ResourceNotFoundError:
+            print(f"{container_client} isn\'t exist >>> creating container!")
+            # Create the container if it does not exist
+            blob_service_client.create_container(container_name)
 
-def generate_unique_name(base_name, existing_names, dirPath):
-    base_name_without_ext = os.path.splitext(base_name)[0]
-    extension = os.path.splitext(base_name)[1]
+        print("\nCONNECT >>> CONTAINER >>> SUCCEED\n")
 
-    if extension == '':
-        base_name_without_ext = base_name
-        extension = '.csv'
-
-    unique_name = base_name
-    i = 1
-
-    while unique_name in existing_names:
-        unique_name = f"{base_name_without_ext}_{i}{extension}"
-        i += 1
-
-        # Construct full file paths
-        old_filepath = os.path.join(dirPath, base_name)
-        new_filepath = os.path.join(dirPath, unique_name)
-        # Rename the file
-        os.rename(old_filepath, new_filepath)
-
-    return unique_name
+        return blob_service_client, container_client, container_name
+    except Exception as ex:
+        print(f">>>{ex}\n")
 
 
 def func_load_data_from_blob(blob_service_client, container_name, blob_name):
@@ -124,69 +104,70 @@ def func_azure_uploader(upload_source_path):
 
     file_list = [f for f in os.listdir(upload_source_path)
                  if os.path.isfile(os.path.join(upload_source_path, f))]
-    print(f'Exported files:\n{file_list}')
+    print(f'Exported files:<{file_list}>')
 
     if len(file_list) > 0:
-
         try:
             blob_service_client, container_client, container_name = func_azure_container_connect()  # return blob_service_client, container_client, container_name
+            print("connected")
         except Exception as ex:
-            print(f">>> Connection Failed:\n>>>{ex}\n(func_azure_container_connect):\n{blob_service_client}\n{container_client}\n{container_name}\n")
+            print(f"Exception: func_azure_uploader, Connection has been failed: >>> {ex} >>> {traceback.extract_tb(list(sys.exc_info())[2])} >>> <{blob_service_client}><{container_client}><{container_name}>")
 
         existing_blobs = [blob.name for blob in container_client.list_blobs()]
-
         for fileName in file_list:
             try:
                 if fileName in existing_blobs:
-                    # TODO: duplicated files to azure with numbers at the end
-                    fileName = generate_unique_name(fileName, existing_blobs, dirPath=upload_source_path)
-                    print("\nUploading to Azure Storage as blob:\n\t" + fileName)
+                    # newfileName = func_generate_unique_name(fileName, existing_blobs, dirPath=upload_source_path)
+
+                    container_client.delete_blob(fileName)
+                    newfileName = fileName
+
+                    print("INFO: Uploading to Azure Storage as blob:\t" + newfileName)
+                    blob_client = blob_service_client.get_blob_client(container=container_name, blob=newfileName)
+                    print(f"INFO: Uploading...<{newfileName}>")
+                else:
+                    blob_client = blob_service_client.get_blob_client(container=container_name, blob=fileName)
+                    print(f"INFO: Uploading...<{fileName}>")
 
                 try:
-                    blob_service_client, container_client, container_name = func_azure_container_connect()  # return blob_service_client, container_client, container_name
+                    with open(f"{upload_source_path}\\{fileName}", "rb") as data:
+                        blob_client.upload_blob(data)
+                    print(f"INFO: Uploading done!")
                 except Exception as ex:
-                    print(f">>> Connection Failed:\n>>>{ex}\n(func_azure_container_connect):\n{blob_service_client}\n{container_client}\n{container_name}\n")
-
-                # connect_str = azure_config['connect_str']
-                # blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-                # container_name = azure_config['container_name']
-
-                blob_client = blob_service_client.get_blob_client(container=container_name, blob=fileName)
-                print("connected")
-
-                with open(f"{upload_source_path}{fileName}", "rb") as data:
-                    print("uploading...")
-                    blob_client.upload_blob(data)
-                print(f">>> Done! {fileName} uploaded!\n")
+                    print(f"Exception: Uploading phase has been failed: >>> {ex} >>> {traceback.extract_tb(list(sys.exc_info())[2])}")
 
             except Exception as ex:
-                print('\nException: func_azure_uploader Failed in the Streaming-Downloading step')
-                print(ex)
+                print(f"Exception: func_azure_uploader has been failed: >>> {ex} >>> {traceback.extract_tb(list(sys.exc_info())[2])}")
                 pass
     else:
-        print('Exported files directory is empty!\n')
+        print('WARNING: Exported files directory is empty!')
 
 
 def func_azure_downloader(downloadedFilesPath):
-    if not os.path.exists(downloadedFilesPath):
-        os.makedirs(downloadedFilesPath)
     try:
         blob_service_client, container_client, container_name = func_azure_container_connect()     # return blob_service_client, container_client, container_name
     except Exception as ex:
-        print(f">>> Connection Failed:\n>>>{ex}\n(func_azure_container_connect):\n{blob_service_client}\n{container_client}\n{container_name}\n")
+        print(f"Exception: func_azure_downloader, Connection has been failed: >>> {ex} >>> {traceback.extract_tb(list(sys.exc_info())[2])} >>> <{blob_service_client}><{container_client}><{container_name}>")
     try:
         blob_list = container_client.list_blobs()
         for blob in blob_list:
-            download_path = os.path.join(downloadedFilesPath, blob.name)
-            print(f"Downloading {blob.name} to {downloadedFilesPath}")
-            blob_f = blob_service_client.get_blob_client(container=container_name, blob=blob.name)
-            with open(download_path, "wb") as download_file:
-                data = blob_f.download_blob().readall()
-                download_file.write(data)
-            print(f"{blob.name} has been downloaded!\n")
+            file_date = func_extract_date_from_filename(file_name=blob.name)
+            case_2_sub_path = f"{downloadedFilesPath}\\{file_date}"
+            if not os.path.exists(case_2_sub_path):
+                os.makedirs(case_2_sub_path)
+
+            if blob.name not in os.listdir(case_2_sub_path):
+                download_path = os.path.join(case_2_sub_path, blob.name)
+                print(f"Downloading {blob.name} to {case_2_sub_path}")
+                blob_f = blob_service_client.get_blob_client(container=container_name, blob=blob.name)
+                with open(download_path, "wb") as download_file:
+                    data = blob_f.download_blob().readall()
+                    download_file.write(data)
+                print(f"{blob.name} has been downloaded!")
+            else:
+                print(f"{blob.name} already exist")
     except Exception as ex:
-        print('Exception: func_azure_downloader Failed in download phase')
-        print(ex)
+        print(f"Exception: func_azure_downloader (downloader) has been failed: >>> {ex} >>> {traceback.extract_tb(list(sys.exc_info())[2])}")
 
 
 def func_azure_streaming():
@@ -228,12 +209,13 @@ def func_azure_streaming():
         print(ex)
 
 
-def func_execute_bat_files():
+def func_execute_bat_files(dir_path_output):
     """ .bat files executes """
-    # TODO: verify where the bats saved
-    if not os.path.exists(path_config['PushExpDataPathRel']):
-        os.makedirs(path_config['PushExpDataPathRel'])
+    print(f'#Subprocess Running... #func_execute_bat_files')
+    if not os.path.exists(dir_path_output):
+        os.makedirs(dir_path_output)
 
+    # TODO: modify the bat file with the output directory == dir_path_output
     for batFile in batsFiles_config:
         try:
             subprocess.run(["cmd.exe", "/c", batsFiles_config[batFile]], shell=True)
