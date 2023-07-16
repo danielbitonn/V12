@@ -64,6 +64,11 @@ if __name__ == '__main__':
     # TODO: Adding timeFrame availability
     # TODO:
 
+    # TODO: move to the relevant place:
+    if not os.path.exists('Images'):
+        os.makedirs('Images')
+
+
     # 1. Logger Initializing
     func_main_logger()
     # 2. Main application
