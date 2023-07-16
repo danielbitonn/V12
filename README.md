@@ -1,9 +1,5 @@
-# V12
--
+# V12 Daily report
+This repository holds a Windows application that collects real-time print machine data, manages Azure's cloud database, and ensures cybersecurity compliance. The app generates analytical HTML views and communicates machine status updates to users via email.
+
 pip install -r requirements.txt
 click "More info" and then "Run anyway" when they see the Windows SmartScreen warning
-
-Exececute compile desktop app into .exe file using cmd In your terminal or command prompt, navigate to the directory containing your Python script (main.py in your case). Then run the following command to create an executable
-
-"pyinstaller --onefile --name="my_executable" --icon=path_to_your_icon.ico main.py"
-"pyinstaller --onefile --name="V12Daily" --icon=src/ref/media/v12.ico --add-data "config.json;." main.py"
