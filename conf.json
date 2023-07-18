@@ -1,0 +1,124 @@
+{
+
+"vers": {
+	"jsonVer"	: "1.0.9",
+	"appVer"	: "1.0.9",
+    "logger"    : "output_log.csv",
+    "daily_report_ver"  : "v109"
+	},
+
+  "presses":{
+	"b70001001"	: "70001001",
+	"b70001002"	: "70001002",
+    "b70001003"	: "70001003",
+	"b70001004"	: "70001004",
+    "b70001005"	: "70001005",
+	"b70001006"	: "70001006"
+  },
+
+  "azure": {
+    "connect_str"       : "DefaultEndpointsProtocol=https;AccountName=v12daily;AccountKey=2tBxBHZwM5WNyzPAyozRtsircGCFBAMN2S3TfZGFN923bIlkWAjdn5scM5vV5TkYPFKvukfD/cL5+AStMluGag==;EndpointSuffix=core.windows.net",
+    "container_name"    : "gcsteamcont",
+    "prssSNSeparator"   : "___SN___",
+    "combineSeperator"  : "_COMB",
+    "dfSeparator"       : "_From",
+    "output_json_path"  : "data\\",
+    "output_json_name"  : "storage_containers_blobs.json"
+	},
+
+  "cmdCommands": {
+    "exportMode"          : "auto",
+    "cmdMyDate"           : "2023-06-27",
+    "cmdFromTime"         : "00:01",
+    "cmdToTime"           : "16:00"
+	},
+  "logApp":   {
+    "AppLogName"          : "AppLogger",
+    "fields"              : ["asctime", "levelname", "message", "name"]
+  },
+
+  "indexes": {
+	"press-state-history"            : "press-state-history*",
+	"restart-history"				: "restart-history*",
+	"event-history"                  : "*event-history*"
+	},
+
+  "paths": {
+    "PressEsExporter"         : "S:\\Press\\PressTools.EsExporter.exe",
+    "exportedData"            : "C:\\ExportedEsData\\",
+    "exBatPath"               : "bats\\",
+    "exDataPath"              : "data\\",
+    "PushExpDataPathRel"      : "data\\push_exported_data\\",
+    "PushExpDataPathRelCMD"   : "data\\push_exported_data_CMD",
+    "PullExpDataPathRel"      : "data\\pull_data\\",
+    "sqldbPath"               : "sqldb\\",
+    "databaseName"            : "PressDB.db",
+    "sqldbPath_csv"           : "sqldb\\db_csv",
+    "from config_manager import *"             : "S:\\Press\\PressDB.db",
+    "exe_comm"                :"bats\\V12Daily_report_v109.exe",
+    "analysis_data_root_path" : "data\\pull_data"
+	},
+
+  "batsFiles": {
+    "press-bat-exporter"				: "bats\\GCSGetRecorded.bat"
+	},
+
+  "widget_sizes": {
+    "width": 30,
+    "height": 5
+},
+
+
+
+
+
+
+  "freecmd": {
+    "comm"      : "@echo off && echo V12 && pause"
+	},
+
+  "allIndexes_ref_not_for_use": {
+    "db-print-attempt"                                  : "print-attempt*",
+    "db-print-session"                                  : "print-session*",
+    "db-w-event-history"                                : "*event-history*",
+	"db-wo-event-history"                               : "event-history*",
+    "db-developer-calibration-history"                  : "developer-calibration-history*",
+    "db-blanket-replacement"                            : "*blanket-replacement*",
+    "db-calibration-history"                            : "*calibration-history*",
+    "db-event-history"                                  : "*event-history*",
+    "db-asid-replacement-history"                       : "asid-replacement-history*",
+    "db-quick-scaling"                                  : "Quick scaling",
+    "db-auto-bias-calibration-history"                  : "auto-bias-calibration-history*",
+    "db-auto-bias-calibration-me-station-data-history"  : "auto-bias-calibration-me-station-data-history*",
+    "db-auto-bias-calibration-raw-data-history"         : "auto-bias-calibration-raw-data-history*",
+    "db-bid-base-replacement-history"                   : "bid-base-replacement-history-*",
+    "db-bid-roller-replacement-history"                 : "bid-roller-replacement-history-*",
+    "db-blanket-replacement-history"                    : "blanket-replacement-history-*",
+    "db-color-calibration-bid-station-data-history"     : "color-calibration-bid-station-data-history*",
+    "db-color-calibration-history"                      : "color-calibration-history*",
+    "db-plc-analog-data"                                : "plc-analog-data*",
+    "db-plc-ios-data-history"                           : "plc-ios-data-history-*",
+    "db-press-state-history"                            : "press-state-history*",
+    "db-print"                                          : "print-*",
+    "db-print-attempt"                                  : "print-attempt*",
+    "db-print-attempt-end-history"                      : "print-attempt-end-history*",
+    "db-print-attempt-start-history"                    : "print-attempt-start-history*",
+    "db-print-session"                                  : "print-session*",
+    "db-restart"                                        : "restart*",
+    "db-separation-session-statistics-internal-history" : "separation-session-statistics-internal-history*",
+    "db-spm-patch-results-data-history"                 : "spm-patch-results-data-history*",
+    "db-substrate-properties"                           : "substrate-properties-*",
+    "db-sw-version"                                     : "sw-version*",
+    "db-tools-history-press-host-app"                   : "tools-history-press.host.app*",
+    "db-sw-version"                                     : "sw-version*",
+    "db-quick-scaling"                                  : "Quick scaling",
+	"db-restart"                                    : "restart*",
+
+    "sw-versions-history"  		: "C:\\ExportedEsData\\GetRecordedIOs.bat",
+    "substratesBat"        		: "C:\\ExportedEsData\\GetRecordedIOs.bat",
+    "printsBat"            		: "C:\\ExportedEsData\\GetRecordedIOs.bat",
+    "eventsBat"             		: "C:\\ExportedEsData\\GetRecordedIOs.bat",
+    "restarts-history_rel"		: "bats\\GCSGetRecorded_rel.bat",
+    "analysis_data_root_path" : "analysis_files\\DB\\data\\pull_data"
+  }
+}
